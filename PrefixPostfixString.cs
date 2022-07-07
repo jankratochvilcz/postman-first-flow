@@ -13,20 +13,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace Postman.Jan.FirstFlow
 {
-    public class GetPostmanEmailResponse
-    {
-        public string Email { get; set; }
-        public string ChartHopSearchQuery { get; set; }
-
-        /// <summary>
-        /// Hardcoded for testing purposes as I don't have access to make integrations in our production Slack account.
-        /// </summary>
-        public string SlackEmail { get; set; }
-
-        public string JiraSearchQuery { get; set; }
-    }
-
-    public class GetPostmanEmailResponseExample : OpenApiExample<GetPostmanEmailResponse>
+    public class PrefixPostfixStringResponseExample : OpenApiExample<GetPostmanEmailResponse>
     {
         public override IOpenApiExample<GetPostmanEmailResponse> Build(
             NamingStrategy namingStrategy = null
@@ -34,14 +21,8 @@ namespace Postman.Jan.FirstFlow
         {
             Examples.Add(
                 OpenApiExampleResolver.Resolve(
-                    "Success Response",
-                    new GetPostmanEmailResponse
-                    {
-                        Email = "jan.kratochvil@postman.com",
-                        ChartHopSearchQuery = "jan+kratochvil",
-                        SlackEmail = "kratochvil.jan@outlook.com",
-                        JiraSearchQuery = "jan.kratochvil"
-                    },
+                    "Response for prefix: a, string: b, postfix: c",
+                    "abc",
                     namingStrategy
                 )
             );
@@ -50,16 +31,16 @@ namespace Postman.Jan.FirstFlow
         }
     }
 
-    public class GetPostmanEmail
+    public class PrefixPostfixString
     {
         private readonly ILogger<GetPostmanEmail> _logger;
 
-        public GetPostmanEmail(ILogger<GetPostmanEmail> log)
+        public PrefixPostfixString(ILogger<GetPostmanEmail> log)
         {
             _logger = log;
         }
 
-        [FunctionName("GetPostmanEmail")]
+        [FunctionName("PrefixPostfixString")]
         [OpenApiOperation(operationId: "Run", tags: new[] { "name" })]
         [OpenApiSecurity(
             "function_key",
@@ -68,18 +49,25 @@ namespace Postman.Jan.FirstFlow
             In = OpenApiSecurityLocationType.Query
         )]
         [OpenApiParameter(
-            name: "firstName",
+            name: "string",
             In = ParameterLocation.Query,
             Required = true,
             Type = typeof(string),
-            Description = "First name"
+            Description = "The target string."
         )]
         [OpenApiParameter(
-            name: "secondName",
+            name: "prefix",
             In = ParameterLocation.Query,
             Required = true,
             Type = typeof(string),
-            Description = "Second (surname) name"
+            Description = "The prefix for the target string."
+        )]
+        [OpenApiParameter(
+            name: "postfix",
+            In = ParameterLocation.Query,
+            Required = true,
+            Type = typeof(string),
+            Description = "The postfix for the target string"
         )]
         [OpenApiResponseWithBody(
             statusCode: HttpStatusCode.OK,
@@ -92,16 +80,11 @@ namespace Postman.Jan.FirstFlow
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req
         )
         {
-            string firstName = req.Query["firstName"];
-            string secondName = req.Query["secondName"];
+            string prefix = req.Query["prefix"];
+            string postfix = req.Query["postfix"];
+            string content = req.Query["string"];
 
-            var response = new GetPostmanEmailResponse
-            {
-                Email = $"{firstName}.{secondName}@postman.com",
-                ChartHopSearchQuery = $"{firstName}+{secondName}",
-                SlackEmail = "kratochvil.jan@outlook.com",
-                JiraSearchQuery = $"{firstName}.{secondName}"
-            };
+            string response = $"{prefix}{content}{postfix}";
 
             return new OkObjectResult(response);
         }
