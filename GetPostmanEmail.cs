@@ -22,6 +22,8 @@ namespace Postman.Jan.FirstFlow
         /// Hardcoded for testing purposes as I don't have access to make integrations in our production Slack account.
         /// </summary>
         public string SlackEmail { get; set; }
+
+        public string JiraSearchQuery { get; set; }
     }
 
     public class GetPostmanEmailResponseExample : OpenApiExample<GetPostmanEmailResponse>
@@ -37,7 +39,8 @@ namespace Postman.Jan.FirstFlow
                     {
                         Email = "jan.kratochvil@postman.com",
                         ChartHopSearchQuery = "jan+kratochvil",
-                        SlackEmail = "kratochvil.jan@outlook.com"
+                        SlackEmail = "kratochvil.jan@outlook.com",
+                        JiraSearchQuery = "jan.kratochvil"
                     },
                     namingStrategy
                 )
@@ -96,7 +99,8 @@ namespace Postman.Jan.FirstFlow
             {
                 Email = $"{firstName}.{secondName}@postman.com",
                 ChartHopSearchQuery = $"{firstName}+{secondName}",
-                SlackEmail = "kratochvil.jan@outlook.com"
+                SlackEmail = "kratochvil.jan@outlook.com",
+                JiraSearchQuery = $"{firstName}.{secondName}"
             };
 
             return new OkObjectResult(response);
