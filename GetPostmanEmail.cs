@@ -17,19 +17,33 @@ namespace Postman.Jan.FirstFlow
     {
         public string Email { get; set; }
         public string ChartHopSearchQuery { get; set; }
+
+        /// <summary>
+        /// Hardcoded for testing purposes as I don't have access to make integrations in our production Slack account.
+        /// </summary>
+        public string SlackEmail { get; set; }
     }
 
     public class GetPostmanEmailResponseExample : OpenApiExample<GetPostmanEmailResponse>
     {
-        public override IOpenApiExample<GetPostmanEmailResponse> Build(NamingStrategy namingStrategy = null)
+        public override IOpenApiExample<GetPostmanEmailResponse> Build(
+            NamingStrategy namingStrategy = null
+        )
         {
-            Examples.Add(OpenApiExampleResolver.Resolve("Success Response", new GetPostmanEmailResponse
-            {
-                Email = "jan.kratochvil@postman.com",
-                ChartHopSearchQuery = "jan+kratochvil"
-            }, namingStrategy));
+            Examples.Add(
+                OpenApiExampleResolver.Resolve(
+                    "Success Response",
+                    new GetPostmanEmailResponse
+                    {
+                        Email = "jan.kratochvil@postman.com",
+                        ChartHopSearchQuery = "jan+kratochvil",
+                        SlackEmail = "kratochvil.jan@outlook.com"
+                    },
+                    namingStrategy
+                )
+            );
 
-        return this;
+            return this;
         }
     }
 
@@ -44,12 +58,36 @@ namespace Postman.Jan.FirstFlow
 
         [FunctionName("GetPostmanEmail")]
         [OpenApiOperation(operationId: "Run", tags: new[] { "name" })]
-        [OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query)]
-        [OpenApiParameter(name: "firstName", In = ParameterLocation.Query, Required = true, Type = typeof(string), Description = "First name")]
-        [OpenApiParameter(name: "secondName", In = ParameterLocation.Query, Required = true, Type = typeof(string), Description = "Second (surname) name")]
-        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(string), Description = "The OK response", Example = typeof(GetPostmanEmailResponseExample))]
+        [OpenApiSecurity(
+            "function_key",
+            SecuritySchemeType.ApiKey,
+            Name = "code",
+            In = OpenApiSecurityLocationType.Query
+        )]
+        [OpenApiParameter(
+            name: "firstName",
+            In = ParameterLocation.Query,
+            Required = true,
+            Type = typeof(string),
+            Description = "First name"
+        )]
+        [OpenApiParameter(
+            name: "secondName",
+            In = ParameterLocation.Query,
+            Required = true,
+            Type = typeof(string),
+            Description = "Second (surname) name"
+        )]
+        [OpenApiResponseWithBody(
+            statusCode: HttpStatusCode.OK,
+            contentType: "application/json",
+            bodyType: typeof(string),
+            Description = "The OK response",
+            Example = typeof(GetPostmanEmailResponseExample)
+        )]
         public IActionResult Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req)
+            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req
+        )
         {
             string firstName = req.Query["firstName"];
             string secondName = req.Query["secondName"];
@@ -57,11 +95,11 @@ namespace Postman.Jan.FirstFlow
             var response = new GetPostmanEmailResponse
             {
                 Email = $"{firstName}.{secondName}@postman.com",
-                ChartHopSearchQuery = $"{firstName}+{secondName}"
+                ChartHopSearchQuery = $"{firstName}+{secondName}",
+                SlackEmail = "kratochvil.jan@outlook.com"
             };
 
             return new OkObjectResult(response);
         }
     }
 }
-
